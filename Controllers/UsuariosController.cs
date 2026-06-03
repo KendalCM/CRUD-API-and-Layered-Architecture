@@ -47,7 +47,7 @@ public class UsuariosController : ControllerBase
     {
         await _service.CrearAsync(usuario);
 
-        return CreatedAtAction(nameof(ObtenerPorId), new { id = usuario.Id }, usuario);
+        return Ok(usuario);
     }
 
     //PUT: api/usuarios/1
