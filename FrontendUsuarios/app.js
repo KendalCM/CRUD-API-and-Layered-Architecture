@@ -3,39 +3,45 @@
 let usuarioEditandoId = null;
 //Obtener Usuarios
 
-async function obtenerUsuarios()
-{
-    try
-    {
+async function obtenerUsuarios() {
+    try {
         const response = await fetch(API_URL);
-        
+
         const usuarios = await response.json();
-        
+
         const tbody = document.getElementById("usuariosBody");
 
         tbody.innerHTML = "";
 
-        usuarios.forEach(usuario =>
-            {
-                tbody.innerHTML += `
+        usuarios.forEach(usuario => {
+            tbody.innerHTML += `
                     <tr>
                         <td>${usuario.id}</td>
                         <td>${usuario.nombre}</td>
                         <td>${usuario.email}</td>
                         <td>
-                            <button onclick="editarUsuario(${usuario.id})">
-                                Editar
+                        <button 
+                            class="btn btn-warning btn-sm"
+                            onclick="editarUsuario(${usuario.id})">
+
+                            Editar
+
                             </button>
-                             <button onclick="eliminarUsuario(${usuario.id})">
+                            
+                            <button
+                                class="btn btn-danger btn-sm"
+                                onclick="eliminarUsuario(${usuario.id})">
+
                                 Eliminar
+
                             </button>
 
                         </td>
                     </tr>
                 `;
-            });
+        });
     }
-    catch(error){
+    catch (error) {
         console.error(error);
     }
 }
@@ -47,26 +53,33 @@ const formulario = document.getElementById("usuarioForm");
 formulario.addEventListener("submit",
     async function (event) {
         event.preventDefault();
+
         const nombre = document.getElementById("nombre").value;
         const email = document.getElementById("email").value;
         const password = document.getElementById("password").value;
-
+        
+        if(!nombre.trim() || !email.trim() || !password.trim())
+        {
+            alert("Todos los campos son obligatorios");
+            return;
+        }
+        
         const usuario = {
             nombre: nombre,
             email: email,
             password: password
         };
-        
+
         try {
             let url = API_URL;
             let metodo = "POST";
 
-            if(usuarioEditandoId !== null){
+            if (usuarioEditandoId !== null) {
                 url = `${API_URL}/${usuarioEditandoId}`;
                 metodo = "PUT";
             }
 
-            const response = await fetch(url,{
+            const response = await fetch(url, {
                 method: metodo,
                 headers:
                 {
@@ -75,15 +88,19 @@ formulario.addEventListener("submit",
                 body: JSON.stringify(usuario)
             });
 
-            if (response.ok){
+            if (response.ok) {
 
-                if(metodo === "POST")
-                {
-                    alert("Usuario creado correctamente");
+                if (metodo === "POST") {
+                    mostrarMensaje(
+                        "Usuario creado correctamente",
+                        "success"
+                    );
                 }
-                else
-                {
-                    alert("Usuario actualizado correctamente");
+                else {
+                    mostrarMensaje(
+                        "Usuario actualizado correctamente",
+                        "warning"
+                    );
                 }
 
                 formulario.reset();
@@ -91,9 +108,9 @@ formulario.addEventListener("submit",
                 document.getElementById("btnGuardar").textContent = "Guardar Usuario";
                 obtenerUsuarios();
             }
-        } 
+        }
         catch (error) {
-            console.error(error);    
+            console.error(error);
         }
     }
 );
@@ -104,25 +121,28 @@ obtenerUsuarios();
 async function eliminarUsuario(id) {
     const confirmar = confirm("¿Desea eliminar este usuario?");
 
-    if(!confirmar){
+    if (!confirmar) {
         return;
     }
 
-    try{
-        const response = 
+    try {
+        const response =
             await fetch(
                 `${API_URL}/${id}`,
                 {
                     method: "DELETE"
                 }
             );
-        if(response.ok){
-            alert("usuario eliminado");
+        if (response.ok) {
+            mostrarMensaje(
+                "Usuario eliminado correctamente",
+                "danger"
+            );
 
             obtenerUsuarios();
         }
     }
-    catch(error){
+    catch (error) {
         console.error(error);
     }
 }
@@ -143,6 +163,15 @@ async function editarUsuario(id) {
     } catch (error) {
         console.error(error);
     }
-    
+}
 
+function mostrarMensaje(texto, tipo){
+    const mensaje = document.getElementById("mensaje");
+    mensaje.innerHTML = `<div class = "alert alert-${tipo}">
+        ${texto}
+    </div>`;
+
+    setTimeout(()=>{
+        mensaje.innerHTML = "";
+    },3000);
 }
