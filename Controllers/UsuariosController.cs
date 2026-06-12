@@ -1,6 +1,7 @@
 ﻿using CRUDTareasAPI.Models;
 using CRUDTareasAPI.Services;
 using Microsoft.AspNetCore.Mvc;
+using CRUDTareasAPI.DTOs;
 
 namespace CRUDTareasAPI.Controllers;
 
@@ -22,7 +23,15 @@ public class UsuariosController : ControllerBase
     public async Task<IActionResult> ObtenerTodos()
     {
         var usuarios = await _service.ObtenerTodosAsync();
-        return Ok(usuarios);
+
+        var usuariosDTO = usuarios.Select(u => new UsuarioDTO
+        {
+            Id = u.Id,
+            Nombre = u.Nombre,
+            Email = u.Email,
+        });
+
+        return Ok(usuariosDTO);
     }
 
     //GET: api/usuarios/1
@@ -36,24 +45,61 @@ public class UsuariosController : ControllerBase
             return NotFound();
         }
 
-        return Ok(usuario);
+        var usuarioDTO = new UsuarioDTO{
+            Id = id,
+            Nombre= usuario.Nombre,
+            Email = usuario.Email
+        };
+
+        return Ok(usuarioDTO);
     }
 
     /// <summary>
     /// Crea un nuevo usuario
     /// </summary>
     [HttpPost]
-    public async Task<IActionResult> Crear(Usuario usuario)
+    public async Task<IActionResult> Crear(CrearUsuarioDTO dto)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        };
+
+        var usuario = new Usuario
+        {
+            Nombre = dto.Nombre,
+            Email = dto.Email,
+            Password = dto.Password
+        };
+
         await _service.CrearAsync(usuario);
 
-        return Ok(usuario);
+        var usuarioDTO = new UsuarioDTO
+        {
+            Id = usuario.Id,
+            Nombre = usuario.Nombre,
+            Email = usuario.Email
+        };
+
+        return Ok(usuarioDTO);
     }
 
     //PUT: api/usuarios/1
     [HttpPut("{id}")]
-    public async Task<IActionResult> Actualizar(int id, Usuario usuario)
+    public async Task<IActionResult> Actualizar(int id, ActualizarUsuarioDTO dto)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        };
+
+        var usuario = new Usuario
+        {
+            Nombre = dto.Nombre,
+            Email = dto.Email,
+            Password = dto.Password
+        };
+
         bool actualizado = await _service.ActualizarAsync(id, usuario);
 
         if (!actualizado)

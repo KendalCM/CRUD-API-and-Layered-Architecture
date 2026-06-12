@@ -1,6 +1,6 @@
 # CRUDTareasAPI
 
-API REST desarrollada con ASP.NET Core 8 y Entity Framework Core utilizando arquitectura en capas.
+CRUD de Usuarios desarrollado con ASP.NET Core Web API, Entity Framework Core y SQL Server.
 
 ## Tecnologías utilizadas
 
