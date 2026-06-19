@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using CRUDTareasAPI.Repositories;
 using CRUDTareasAPI.Services;
 using System.Reflection;
+using CRUDTareasAPI.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,6 +54,8 @@ app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 
 app.UseAuthorization();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.MapControllers();
 

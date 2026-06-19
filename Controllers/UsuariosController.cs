@@ -40,11 +40,6 @@ public class UsuariosController : ControllerBase
     {
         var usuario = await _service.ObtenerPorIdAsync(id);
 
-        if (usuario == null)
-        {
-            return NotFound();
-        }
-
         var usuarioDTO = new UsuarioDTO{
             Id = id,
             Nombre= usuario.Nombre,
@@ -60,10 +55,6 @@ public class UsuariosController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Crear(CrearUsuarioDTO dto)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        };
 
         var usuario = new Usuario
         {
@@ -88,10 +79,6 @@ public class UsuariosController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Actualizar(int id, ActualizarUsuarioDTO dto)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        };
 
         var usuario = new Usuario
         {
@@ -100,12 +87,7 @@ public class UsuariosController : ControllerBase
             Password = dto.Password
         };
 
-        bool actualizado = await _service.ActualizarAsync(id, usuario);
-
-        if (!actualizado)
-        {
-            return NotFound();
-        }
+        await _service.ActualizarAsync(id, usuario);
 
         return NoContent();
     }
@@ -114,13 +96,7 @@ public class UsuariosController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Eliminar(int id)
     {
-        bool eliminado =
-            await _service.EliminarAsync(id);
-
-        if (!eliminado)
-        {
-            return NotFound();
-        }
+        await _service.EliminarAsync(id);
 
         return NoContent();
     }
