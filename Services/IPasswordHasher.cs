@@ -1,6 +1,9 @@
-﻿namespace CRUDTareasAPI.Services
+﻿namespace CRUDTareasAPI.Services;
+
+public interface IPasswordHasher
 {
-    public class IPasswordHasher
-    {
-    }
+    string HashPassword(string password);
+
+    bool VerifyPassword(string password, string passwordHash);
+
 }

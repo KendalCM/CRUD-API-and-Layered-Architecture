@@ -11,11 +11,13 @@ public class UsuarioService
 {
     private readonly UsuarioRepository _repository;
     private readonly IMapper _mapper;
+    private readonly IPasswordHasher _passwordHasher;
 
-    public UsuarioService(UsuarioRepository repository, IMapper mapper)
+    public UsuarioService(UsuarioRepository repository, IMapper mapper, IPasswordHasher passwordHasher)
     {
         _repository = repository;
         _mapper = mapper;
+        _passwordHasher = passwordHasher;
     }
 
     public async Task<List<Usuario>> ObtenerTodosAsync()
@@ -35,17 +37,23 @@ public class UsuarioService
         return usuario;
     }
 
-    public async Task CrearAsync(Usuario usuario)
+    public async Task<Usuario> CrearAsync(CrearUsuarioDTO dto)
     {
         //Verificar duplicados
-        var usuarioExistente = await _repository.ObtenerPorEmailAsync(usuario.Email);
+        var usuarioExistente = await _repository.ObtenerPorEmailAsync(dto.Email);
 
         if (usuarioExistente != null)
         {
             throw new EmailDuplicadoException();
         }
 
+        var usuario = _mapper.Map<Usuario>(dto);
+
+        usuario.Password = _passwordHasher.HashPassword(dto.Password);
+
         await _repository.CrearAsync(usuario);
+
+        return usuario;
     }
 
     public async Task ActualizarAsync(int id, ActualizarUsuarioDTO dto)
@@ -65,6 +73,8 @@ public class UsuarioService
         }
 
         _mapper.Map(dto, usuario);
+
+        usuario.Password = _passwordHasher.HashPassword(dto.Password);
 
         await _repository.ActualizarAsync(usuario);
     }

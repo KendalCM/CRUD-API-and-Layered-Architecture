@@ -50,9 +50,7 @@ public class UsuariosController : ControllerBase
     public async Task<IActionResult> Crear(CrearUsuarioDTO dto)
     {
 
-        var usuario = _mapper.Map<Usuario>(dto);
-
-        await _service.CrearAsync(usuario);
+        var usuario = await _service.CrearAsync(dto);
 
         var usuarioDTO = _mapper.Map<UsuarioDTO>(usuario);
         
