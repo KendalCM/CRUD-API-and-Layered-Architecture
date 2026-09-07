@@ -1,15 +1,16 @@
 using CRUDTareasAPI.Data;
-using Microsoft.EntityFrameworkCore;
+using CRUDTareasAPI.Mapping;
+using CRUDTareasAPI.Middlewares;
 using CRUDTareasAPI.Repositories;
 using CRUDTareasAPI.Services;
+using Microsoft.EntityFrameworkCore;
 using System.Reflection;
-using CRUDTareasAPI.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
+builder.Services.AddAutoMapper(cfg => { }, typeof(UsuarioProfile));
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>

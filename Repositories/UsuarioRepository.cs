@@ -31,6 +31,12 @@ public class UsuarioRepository
         return await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == email);
     }
 
+    //Buscar un mismo email con diferente id
+    public async Task<Usuario?> ObtenerPorEmailExceptoIdAsync(string email, int id)
+    {
+        return await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == email && u.Id != id);
+    }
+
     //Create
     public async Task CrearAsync(Usuario usuario)
     {
@@ -39,7 +45,7 @@ public class UsuarioRepository
     }
 
     //Update
-    public async Task ActualiazarAsync(Usuario usuario)
+    public async Task ActualizarAsync(Usuario usuario)
     {
         _context.Usuarios.Update(usuario);
         await _context.SaveChangesAsync();

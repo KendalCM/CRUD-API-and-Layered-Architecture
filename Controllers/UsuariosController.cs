@@ -2,6 +2,7 @@
 using CRUDTareasAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using CRUDTareasAPI.DTOs;
+using AutoMapper;
 
 namespace CRUDTareasAPI.Controllers;
 
@@ -10,10 +11,12 @@ namespace CRUDTareasAPI.Controllers;
 public class UsuariosController : ControllerBase
 {
     private readonly UsuarioService _service;
+    private readonly IMapper _mapper;
 
-    public UsuariosController(UsuarioService service)
+    public UsuariosController(UsuarioService service, IMapper mapper)
     {
         _service = service;
+        _mapper = mapper;
     }
 
     /// <summary>
@@ -24,12 +27,7 @@ public class UsuariosController : ControllerBase
     {
         var usuarios = await _service.ObtenerTodosAsync();
 
-        var usuariosDTO = usuarios.Select(u => new UsuarioDTO
-        {
-            Id = u.Id,
-            Nombre = u.Nombre,
-            Email = u.Email,
-        });
+        var usuariosDTO = _mapper.Map<List<UsuarioDTO>>(usuarios);
 
         return Ok(usuariosDTO);
     }
@@ -40,11 +38,7 @@ public class UsuariosController : ControllerBase
     {
         var usuario = await _service.ObtenerPorIdAsync(id);
 
-        var usuarioDTO = new UsuarioDTO{
-            Id = id,
-            Nombre= usuario.Nombre,
-            Email = usuario.Email
-        };
+        var usuarioDTO = _mapper.Map<UsuarioDTO>(usuario);
 
         return Ok(usuarioDTO);
     }
@@ -56,22 +50,12 @@ public class UsuariosController : ControllerBase
     public async Task<IActionResult> Crear(CrearUsuarioDTO dto)
     {
 
-        var usuario = new Usuario
-        {
-            Nombre = dto.Nombre,
-            Email = dto.Email,
-            Password = dto.Password
-        };
+        var usuario = _mapper.Map<Usuario>(dto);
 
         await _service.CrearAsync(usuario);
 
-        var usuarioDTO = new UsuarioDTO
-        {
-            Id = usuario.Id,
-            Nombre = usuario.Nombre,
-            Email = usuario.Email
-        };
-
+        var usuarioDTO = _mapper.Map<UsuarioDTO>(usuario);
+        
         return Ok(usuarioDTO);
     }
 
@@ -80,14 +64,7 @@ public class UsuariosController : ControllerBase
     public async Task<IActionResult> Actualizar(int id, ActualizarUsuarioDTO dto)
     {
 
-        var usuario = new Usuario
-        {
-            Nombre = dto.Nombre,
-            Email = dto.Email,
-            Password = dto.Password
-        };
-
-        await _service.ActualizarAsync(id, usuario);
+        await _service.ActualizarAsync(id, dto);
 
         return NoContent();
     }

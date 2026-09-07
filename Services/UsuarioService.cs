@@ -1,4 +1,6 @@
-﻿using CRUDTareasAPI.Exceptions;
+﻿using AutoMapper;
+using CRUDTareasAPI.DTOs;
+using CRUDTareasAPI.Exceptions;
 using CRUDTareasAPI.Middlewares;
 using CRUDTareasAPI.Models;
 using CRUDTareasAPI.Repositories;
@@ -8,10 +10,12 @@ namespace CRUDTareasAPI.Services;
 public class UsuarioService
 {
     private readonly UsuarioRepository _repository;
+    private readonly IMapper _mapper;
 
-    public UsuarioService(UsuarioRepository repository)
+    public UsuarioService(UsuarioRepository repository, IMapper mapper)
     {
         _repository = repository;
+        _mapper = mapper;
     }
 
     public async Task<List<Usuario>> ObtenerTodosAsync()
@@ -44,7 +48,7 @@ public class UsuarioService
         await _repository.CrearAsync(usuario);
     }
 
-    public async Task ActualizarAsync(int id, Usuario usuarioActualizado)
+    public async Task ActualizarAsync(int id, ActualizarUsuarioDTO dto)
     {
         var usuario = await _repository.ObtenerPorIdAsync(id);
 
@@ -53,11 +57,16 @@ public class UsuarioService
             throw new UsuarioNoEncontradoException();
         }
 
-        usuario.Nombre = usuarioActualizado.Nombre;
-        usuario.Email = usuarioActualizado.Email;
-        usuario.Password = usuarioActualizado.Password;
+        var usuarioExistente = await _repository.ObtenerPorEmailExceptoIdAsync(dto.Email, id);
 
-        await _repository.ActualiazarAsync(usuario);
+        if (usuarioExistente != null)
+        {
+            throw new EmailDuplicadoException();
+        }
+
+        _mapper.Map(dto, usuario);
+
+        await _repository.ActualizarAsync(usuario);
     }
 
     public async Task EliminarAsync(int id)

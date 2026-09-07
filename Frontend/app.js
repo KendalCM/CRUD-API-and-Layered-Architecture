@@ -88,6 +88,12 @@ formulario.addEventListener("submit",
                 body: JSON.stringify(usuario)
             });
 
+            console.log("Status:", response.status);
+
+            const respuesta = await response.text();
+
+            console.log("Respuesta de la API:", respuesta);
+
             if (response.ok) {
 
                 if (metodo === "POST") {
